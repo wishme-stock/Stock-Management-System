@@ -64,7 +64,7 @@
     <main class="main-content" id="mainContent"></main>
 </div>
 
-<!-- Firebase v8 compat (works from any file:// or http://) -->
+<!-- Firebase v8 compat (works correctly with app.js) -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
@@ -81,11 +81,20 @@
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
 
-  // Make them globally accessible to app.js
+  // Wrappers that match how app.js calls them:
   window.firebaseDB = database;
-  window.firebaseRef = function(refPath) { return database.ref(refPath); };
-  window.firebaseSet = function(ref, data) { ref.set(data); };
-  window.firebaseOnValue = function(ref, callback) { ref.on('value', snapshot => callback(snapshot)); };
+  window.firebaseRef = function(db, path) {
+    // app.js calls firebaseRef(database, 'path')
+    return db.ref(path);
+  };
+  window.firebaseSet = function(ref, data) {
+    return ref.set(data);
+  };
+  window.firebaseOnValue = function(ref, callback) {
+    ref.on('value', function(snapshot) {
+      callback(snapshot);
+    });
+  };
 </script>
 
 <script src="js/app.js"></script>
