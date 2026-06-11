@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>WishMe Enterprise - Inventory, Sales & Business Management Suite</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.2/dist/quagga.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+<div id="loginScreen" class="login-screen">
+    <div class="login-bg-slideshow" id="loginBgSlideshow"></div><div class="login-bg-overlay"></div>
+    <div class="login-card"><div class="login-logo" id="loginLogoDisplay">🏢</div><h1>WishMe Enterprise</h1><p class="subtitle">Inventory, Sales & Business Management Suite v7.0</p><div class="login-error" id="loginError"></div><select id="loginUser"><option value="">-- Select User --</option></select><input type="password" id="loginPass" placeholder="Enter password" onkeypress="if(event.key==='Enter')doLogin()"><button class="btn btn-primary btn-block" onclick="doLogin()">🔐 Sign In</button><div style="margin-top:14px;font-size:0.75rem;"><a href="#" onclick="showForgotPassword()" style="color:var(--primary);text-decoration:none;">🔑 Forgot Password?</a></div><div class="login-info">Admin: <code>admin123</code> | Staff: <code>staff123</code></div></div>
+    <div class="login-bg-controls" id="loginBgControls"></div>
+    <div style="position:absolute;bottom:20px;left:20px;z-index:3;"><button class="btn btn-sm" style="background:rgba(255,255,255,0.15);color:white;font-size:0.7rem;" onclick="document.getElementById('customBgInput').click()">🖼️ Custom BG</button><input type="file" id="customBgInput" accept="image/*" style="display:none;" onchange="addCustomBackground(event)"><button class="btn btn-sm" style="background:rgba(255,255,255,0.15);color:white;font-size:0.7rem;margin-left:4px;" onclick="resetBackgrounds()">🔄 Reset</button></div>
+</div>
+<div id="imageModal" class="image-modal" onclick="closeImageModal()"><span class="image-modal-close">&times;</span><img class="image-modal-content" id="modalImage"></div>
+<div id="appLayout" style="display:none;">
+    <header class="branding-bar"><div class="branding-left"><button class="hamburger" onclick="toggleSidebar()">☰</button><div id="branding-logo-container"></div><div><div class="branding-name" id="branding-company-name">WishMe Enterprise</div><div class="branding-tagline">Inventory, Sales & Business Management Suite</div></div></div><div class="branding-right"><span id="branding-date"></span><button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button><div class="user-badge"><span id="currentUserName"></span><span class="user-role-tag" id="currentUserRole"></span></div><button class="btn btn-ghost btn-sm" onclick="doLogout()" style="color:white;">🚪</button></div></header>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <aside class="sidebar" id="sidebar"><div class="sidebar-header"><div id="sidebar-logo-container"></div><h2 id="sidebar-company-name">WishMe Enterprise</h2><div class="version">v7.0 FINAL</div></div><div class="storage-indicator"><span class="dot"></span><span id="storage-status-text">💾 Ready</span></div><nav class="nav-menu">
+        <button class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span> Dashboard</button>
+        <div class="nav-section">Products</div>
+        <button class="nav-item admin-menu" data-page="products"><span class="nav-icon">🏷️</span> Products</button>
+        <button class="nav-item admin-menu" data-page="bulk-import"><span class="nav-icon">📥</span> Bulk Import</button>
+        <div class="nav-section">CRM</div>
+        <button class="nav-item admin-menu" data-page="customers"><span class="nav-icon">👥</span> Customers</button>
+        <button class="nav-item admin-menu" data-page="bulk-customers"><span class="nav-icon">📥</span> Bulk Customers</button>
+        <button class="nav-item admin-menu" data-page="suppliers"><span class="nav-icon">🏭</span> Suppliers</button>
+        <button class="nav-item admin-menu" data-page="bulk-suppliers"><span class="nav-icon">📥</span> Bulk Suppliers</button>
+        <div class="nav-section">Transactions</div>
+        <button class="nav-item" data-page="purchase"><span class="nav-icon">📥</span> Add Purchase</button>
+        <button class="nav-item" data-page="sale"><span class="nav-icon">📤</span> Record Sale</button>
+        <button class="nav-item" data-page="drafts"><span class="nav-icon">📋</span> Draft Invoices</button>
+        <div class="nav-section">Finance</div>
+        <button class="nav-item admin-menu" data-page="expenses"><span class="nav-icon">💸</span> Expenses</button>
+        <button class="nav-item admin-menu" data-page="credit-sales"><span class="nav-icon">📋</span> Credit/Due Sales</button>
+        <button class="nav-item admin-menu" data-page="cash-book"><span class="nav-icon">📒</span> Daily Cash Book</button>
+        <div class="nav-section">Reports</div>
+        <button class="nav-item admin-menu" data-page="stock"><span class="nav-icon">📋</span> Stock Report</button>
+        <button class="nav-item admin-menu" data-page="profit"><span class="nav-icon">💰</span> Profit & Loss</button>
+        <button class="nav-item admin-menu" data-page="inventory-aging"><span class="nav-icon">📅</span> Inventory Aging</button>
+        <button class="nav-item admin-menu" data-page="top-products"><span class="nav-icon">🏆</span> Top/Slow Products</button>
+        <button class="nav-item admin-menu" data-page="expiry"><span class="nav-icon">⏰</span> Expiry Tracker</button>
+        <div class="nav-section admin-menu">Settings</div>
+        <button class="nav-item admin-menu" data-page="branding"><span class="nav-icon">🎨</span> Branding & Company</button>
+        <button class="nav-item admin-menu" data-page="users"><span class="nav-icon">👥</span> Manage Users</button>
+        <button class="nav-item admin-menu" data-page="storage-settings"><span class="nav-icon">📁</span> Backup & Google Drive</button>
+        <button class="nav-item admin-menu" data-page="settings"><span class="nav-icon">⚙️</span> Settings</button>
+        <div class="nav-section">Account</div>
+        <button class="nav-item" data-page="activity"><span class="nav-icon">📝</span> My Activity</button>
+        <button class="nav-item" data-page="change-password"><span class="nav-icon">🔐</span> Change Password</button>
+    </nav><div class="sidebar-footer"><span>© <span id="footer-year">2026</span> <span id="footer-company">WishMe Enterprise</span></span><span id="storage-usage">📊 ...</span></div></aside>
+    <main class="main-content" id="mainContent"></main>
+</div>
+
+<!-- Firebase Realtime Database -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDkDzvJCXRnlZ_Ae1ekzEHnvqe1uyd9Ibw",
+    authDomain: "wishme-stock.firebaseapp.com",
+    databaseURL: "https://wishme-stock-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "wishme-stock",
+    storageBucket: "wishme-stock.firebasestorage.app",
+    messagingSenderId: "568410897735",
+    appId: "1:568410897735:web:981f204243e6fbdbfa6062"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+
+  // Expose Firebase functions globally so app.js can use them
+  window.firebaseDB = database;
+  window.firebaseRef = ref;
+  window.firebaseSet = set;
+  window.firebaseOnValue = onValue;
+</script>
+
+<script src="js/app.js"></script>
+</body>
+</html>
